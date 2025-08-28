@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Server - EJS</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>Chatbot</h1>
+      <div class="chat-messages">
+        <% messages.forEach(msg => { %>
+        <div class="message <%= msg.sender.toLowerCase() %>">
+          <strong><%= msg.sender %>:</strong> <%= msg.text %>
+        </div>
+        <% }) %>
+      </div>
+      <% if (typeof error !== 'undefined' && error) { %>
+      <div
+        class="error-message">
+        <strong>Error:</strong> <%= error %>
+      </div>
+      <% } %>
+      <form method="POST" action="/chat" class="chat-form">
+          <input 
+            type="text"
+            name="message" 
+            placeholder="Write your message here"
+            required
+          >
+          <button type="submit">Send</button>
+      </form>
+    </div>
+  </body>
+</html>
