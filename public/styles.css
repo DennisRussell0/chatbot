@@ -155,7 +155,7 @@ h1 {
   }
 
   .chat-messages {
-    width: calc(100% - 40px);
+    width: calc(100% - 32px);
   }
 
   .message:nth-child(1) {
