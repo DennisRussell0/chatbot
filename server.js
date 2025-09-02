@@ -25,23 +25,25 @@ app.post("/chat", (req, res) => {
   // Convert user message to lowercase and trim whitespace
   let userMessage = req.body.message.toLowerCase().trim();
 
-  // Default bor reply and error message
+  // Default bot reply and error message
   let botReply = "I didn't understand your message.";
   let error = "";
 
   // Sanitize user input (remove potentially harmful characters/data)
   userMessage = sanitizeInput(userMessage);
 
-  // Validate user input - most specific checks first
-  if (!userMessage || userMessage.trim() === "") {
+  // Validate user input
+  if (!userMessage) {
     error = "You must write a message.";
     botReply = "Write a message to chat.";
   } else if (userMessage.length < 2) {
     error = "The message must be at least two characters long.";
-    botReply = "Your message was too short. Try again.";
-  } else if (userMessage.length > 500) {
-    error = "Message too long (maximum 500 characters)!";
-    botReply = "Your message was too long. Try and make it shorter.";
+    botReply =
+      "Your message must contain at least 2 characters. Please try again.";
+  } else if (userMessage.length > 100) {
+    error = "Message too long (maximum 100 characters)!";
+    botReply =
+      "Your message must not contain more than 100 characters. Please try again.";
   } else {
     // Split the input into sentences by "."
     // Remove extra spaces and ignore empty parts
@@ -56,10 +58,27 @@ app.post("/chat", (req, res) => {
     for (const part of parts) {
       let foundResponse = false;
 
-      // Look for a matching keyword in predefined responses
-      for (let response of responses) {
-        for (let keyword of response.keywords) {
-          if (part.toLowerCase().includes(keyword)) {
+      // Specific logic first
+      if (part.includes("thank") && part.includes("help")) {
+        replies.push("You're welcome! I'm here to help.");
+        foundResponse = true;
+      } else if (part.includes("thank")) {
+        replies.push("You're welcome!");
+        foundResponse = true;
+      } else if (part.includes("sorry")) {
+        replies.push("It's alright, no problem!");
+        foundResponse = true;
+      }
+
+      // General logic (fallback)
+      if (!foundResponse) {
+        // Look for a matching keyword in predefined responses
+        for (let response of responses) {
+          if (
+            response.keywords.some((keyword) =>
+              part.toLowerCase().includes(keyword)
+            )
+          ) {
             // Pick a random answer if keyword is found
             const randomIndex = Math.floor(
               Math.random() * response.answers.length
@@ -69,25 +88,31 @@ app.post("/chat", (req, res) => {
             break;
           }
         }
-        if (foundResponse) break;
       }
+
       // If no response matched, use a default reply
       if (!foundResponse) {
-        replies.push(`You wrote: "${part}". Try and write something new.`);
+        replies.push(
+          `I don't understand your message: "${part}". Please try and write something else.`
+        );
       }
     }
 
     botReply = replies.join(" ");
 
-    // Save user and bot messages if no error
-    if (!error) {
-      messages.push({ sender: "User", text: userMessage });
-      messages.push({ sender: "Bot", text: botReply });
-    }
+    // No error -> save and redirect
+    messages.push({ sender: "User", text: userMessage });
+    messages.push({ sender: "Bot", text: botReply });
+    return res.redirect("/");
   }
 
   // Render the chat page with updated messages and any error
-  res.render("index", { messages, botReply, error });
+  if (error) {
+    messages.push({ sender: "Bot", text: botReply });
+  }
+
+  // Render the chat page with updated messages and any error
+  res.render("index", { messages, botReply /*, error*/ });
 });
 
 // Start the server on port 3000

@@ -17,21 +17,23 @@
           </div>
           <% }) %>
         </div>
-        <% if (typeof error !== 'undefined' && error) { %>
+        <!--<% if (typeof error !== 'undefined' && error) { %>
         <div class="error-message"><strong>Error:</strong> <%= error %></div>
-        <% } %>
+        <% } %>-->
       </div>
       <form method="POST" action="/chat" class="chat-form">
         <input
           type="text"
           name="message"
           placeholder="Write your message here"
-          oninvalid="this.setCustomValidity('Write your message here')"
-          oninput="this.setCustomValidity('')"
           class="chat-input"
         />
         <button type="submit" class="chat-button">Send</button>
       </form>
     </div>
+    <script>
+      const chat = document.querySelector(".chat-messages-wrapper");
+      chat.scrollTop = chat.scrollHeight;
+    </script>
   </body>
 </html>
