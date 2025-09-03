@@ -8,7 +8,10 @@
   <body>
     <span class="mobile-header-background"></span>
     <div class="body-wrapper">
-      <h1>ChatBot</h1>
+      <header>
+        <h1>ChatBot</h1>
+        <button class="open-personalization-modal">Personalize</button>
+      </header>
       <div class="chat-messages-wrapper">
         <div class="chat-messages">
           <% messages.forEach(msg => { %>
@@ -31,9 +34,43 @@
         <button type="submit" class="chat-button">Send</button>
       </form>
     </div>
+    <!-- Personalization modal -->
+    <div class="modal-overlay" id="personalizationModalOverlay">
+      <div class="personalization-modal">
+        <h2>Personalize me!</h2>
+        <p>Here you can personalize my answers.</p>
+        <button id="closePersonalizationModal">Close</button>
+      </div>
+    </div>
     <script>
       const chat = document.querySelector(".chat-messages-wrapper");
       chat.scrollTop = chat.scrollHeight;
+
+      // Modal functionality
+      const modalOverlay = document.getElementById(
+        "personalizationModalOverlay"
+      );
+      const openModalBtn = document.querySelector(
+        ".open-personalization-modal"
+      );
+      const closeModalBtn = document.getElementById(
+        "closePersonalizationModal"
+      );
+
+      openModalBtn.addEventListener("click", () => {
+        modalOverlay.style.display = "flex";
+      });
+
+      closeModalBtn.addEventListener("click", () => {
+        modalOverlay.style.display = "none";
+      });
+
+      // Close when clicking outside of modal
+      modalOverlay.addEventListener("click", (e) => {
+        if (e.target === modalOverlay) {
+          modalOverlay.style.display = "none";
+        }
+      });
     </script>
   </body>
 </html>

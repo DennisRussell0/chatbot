@@ -10,9 +10,13 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the "public" directory
-app.use(express.static("public"/*, {
+app.use(
+  express.static(
+    "public" /*, {
   maxAge: "1d" // Or e.g. 3600 for 1 hour - caching static assets
-}*/));
+}*/
+  )
+);
 
 // Store all chat messages
 const messages = [];
@@ -25,10 +29,12 @@ app.get("/", (req, res) => {
 // Handle chat form submission on POST "/chat"
 app.post("/chat", (req, res) => {
   // Convert user message to lowercase and trim whitespace
-  let userMessage = req.body.message.toLowerCase().trim();
+  let originalUserMessage = req.body.message.trim();
+  let userMessage = originalUserMessage.toLowerCase();
 
   // Default bot reply and error message
-  let botReply = "I didn't understand your message.";
+  let botReply =
+    "I didn't understand your message. Try and write something else.";
   let error = "";
 
   // Sanitize user input (remove potentially harmful characters/data)
@@ -61,7 +67,10 @@ app.post("/chat", (req, res) => {
       let foundResponse = false;
 
       // Specific logic first
-      if (part.includes("thank") && part.includes("help")) {
+      if (part.includes("thank") && part.includes("nothing")) {
+        replies.push("That's not very nice...");
+        foundResponse = true;
+      } else if (part.includes("thank") && part.includes("help")) {
         replies.push("You're welcome! I'm here to help.");
         foundResponse = true;
       } else if (part.includes("thank")) {
@@ -103,7 +112,7 @@ app.post("/chat", (req, res) => {
     botReply = replies.join(" ");
 
     // No error -> save and redirect
-    messages.push({ sender: "User", text: userMessage });
+    messages.push({ sender: "User", text: originalUserMessage });
     messages.push({ sender: "Bot", text: botReply });
     return res.redirect("/");
   }
