@@ -10,7 +10,9 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the "public" directory
-app.use(express.static("public"));
+app.use(express.static("public"/*, {
+  maxAge: "1d" // Or e.g. 3600 for 1 hour - caching static assets
+}*/));
 
 // Store all chat messages
 const messages = [];
