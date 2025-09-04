@@ -11,11 +11,20 @@
       <header>
         <h1>ChatBot</h1>
         <button class="open-personalization-modal">Personalize</button>
+        <!--<div>
+          <p>Most popular category:</p>
+          <%= Object.keys(categoryStats).sort((a,b) => categoryStats[b] -
+          categoryStats[a])[0] %>
+        </div>-->
       </header>
       <div class="chat-messages-wrapper">
         <div class="chat-messages">
           <% messages.forEach(msg => { %>
           <div class="message <%= msg.sender.toLowerCase() %>">
+            <!--<div>
+              <span class="category-tag"><%= msg.category %></span>
+              <span class="timestamp"><%= msg.time %></span>
+            </div>-->
             <%= msg.text %>
           </div>
           <% }) %>
@@ -35,10 +44,31 @@
       </form>
     </div>
     <!-- Personalization modal -->
-    <div class="modal-overlay" id="personalizationModalOverlay">
+    <div class="personalization-modal-overlay" id="personalizationModalOverlay">
       <div class="personalization-modal">
-        <h2>Personalize me!</h2>
-        <p>Here you can personalize my answers.</p>
+        <h2>Personalization</h2>
+        <p>Here you can personalize my resonses.</p>
+        <form method="POST" action="/add-response" class="personalization-form">
+          <input
+            type="text"
+            name="keyword"
+            placeholder="Keyword(s) (e.g. 'beluga whale' or 'weissbier')"
+            required
+            maxlength="50"
+            class="personalization-inputs"
+          />
+          <input
+            type="text"
+            name="answer"
+            placeholder="Answer (e.g. 'I'd love a beluga whale in my backyard pond')"
+            required
+            maxlength="200"
+            class="personalization-inputs"
+          />
+          <button class="add-response-button" type="submit">
+            Add response
+          </button>
+        </form>
         <button id="closePersonalizationModal">Close</button>
       </div>
     </div>
