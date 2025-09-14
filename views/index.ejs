@@ -39,7 +39,11 @@
           name="message"
           placeholder="Write your message here"
           class="chat-input"
+          id="message-input"
         />
+        <div class="character-counter">
+          <span id="character-count">0</span>/100
+        </div>
         <button type="submit" class="chat-button">Send</button>
       </form>
     </div>
@@ -73,6 +77,7 @@
       </div>
     </div>
     <script>
+      // Chat messages wrapper
       const chat = document.querySelector(".chat-messages-wrapper");
       chat.scrollTop = chat.scrollHeight;
 
@@ -101,6 +106,24 @@
           modalOverlay.style.display = "none";
         }
       });
+
+      // character counter
+      let input = document.getElementById("message-input");
+      let counter = document.getElementById("character-count");
+      let container = document.querySelector(".character-counter");
+
+      input.addEventListener("input", function(event) {
+        let length = event.target.value.length
+        counter.innerText = length
+
+        container.classList.remove("warning", "danger")
+
+        if (length > 100) {
+          container.classList.add("danger")
+        } else if (length > 75) {
+          container.classList.add("warning")
+        }
+      })
     </script>
   </body>
 </html>
