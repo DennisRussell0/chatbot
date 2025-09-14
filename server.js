@@ -34,10 +34,17 @@ function getCategoryStats() {
 
 // Render the chat page on GET "/" (when the user visits the root URL)
 app.get("/", (req, res) => {
+  const totalMessages = messages.length;
+  const userCount = messages.filter(msg => msg.sender === "User").length;
+  const botCount = messages.filter(msg => msg.sender === "Bot").length;
+
   res.render("index", {
     messages,
     botReply: "",
     categoryStats: getCategoryStats(),
+    totalMessages, 
+    userCount, 
+    botCount
   });
 });
 
@@ -131,7 +138,7 @@ app.post("/chat", (req, res) => {
 
     // Extra logic depending on category
     if (matchedCategory === "feelings") {
-      botReply += " Would you like me tell you more about how I feel?";
+      botReply += " Would you like me tell you about how I feel?";
     } else if (matchedCategory === "favour") {
       botReply += " Feel free to do me a favour if you want!";
     }
@@ -151,6 +158,9 @@ app.post("/chat", (req, res) => {
       category: matchedCategory,
     });
 
+    // Only show 10 latest messages
+    // if (messages.length > 10) messages.shift();
+
     return res.redirect("/");
   }
 
@@ -165,7 +175,7 @@ app.post("/chat", (req, res) => {
   }
 
   // Render the chat page with updated messages and any error
-  res.render("index", { messages, botReply /*, error*/ });
+  res.render("index", { messages, botReply, /* totalMessages, userCount, botCount, error*/ });
 });
 
 // Handle personalization form submission on POST "/add-response"
@@ -225,6 +235,12 @@ app.get("/stats", (req, res) => {
     categoryStats: getCategoryStats(),
     messages,
   });
+});
+
+// Reset message array
+app.post("/clear", (req, res) => {
+  messages.length = 0;
+  res.redirect("/");
 });
 
 // Start the server on port 3000
