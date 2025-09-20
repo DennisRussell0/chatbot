@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Client Server - EJS</title>
+    <title>ChatBot</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -16,27 +16,20 @@
         </form>
         <!--<div>
           <p>Most popular category:</p>
-          <%= Object.keys(categoryStats).sort((a,b) => categoryStats[b] -
-          categoryStats[a])[0] %>
-        </div>-->
-        <!--<p>Antal beskeder i chatten: <%= totalMessages %></p>
-        <p>Brugerbeskeder: <%= userCount %> | Botbeskeder: <%= botCount %></p>-->
+        </div>
+        <p>Antal beskeder i chatten:</p>
+        <p>Brugerbeskeder: | Botbeskeder: </p>-->
       </header>
       <div class="chat-messages-wrapper">
         <div class="chat-messages">
-          <% messages.forEach(msg => { %>
           <div class="message <%= msg.sender.toLowerCase() %>">
             <!--<div>
-              <span class="category-tag"><%= msg.category %></span>
-              <span class="timestamp"><%= msg.time %></span>
+              <span class="category-tag"></span>
+              <span class="timestamp"></span>
             </div>-->
-            <%= msg.text %>
           </div>
-          <% }) %>
         </div>
-        <!--<% if (typeof error !== 'undefined' && error) { %>
-        <div class="error-message"><strong>Error:</strong> <%= error %></div>
-        <% } %>-->
+        <!--<div class="error-message"><strong>Error:</strong></div>-->
       </div>
       <form method="POST" action="/chat" class="chat-form">
         <input
