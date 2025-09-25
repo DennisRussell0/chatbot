@@ -5,10 +5,10 @@ import responses from "../services/responses.js";
 
 const router = express.Router();
 
-// Store all chat messages momentarily - later in data/messages.json
+// Store all chat messages momentarily - eventually in data/messages.json
 const messages = [];
 
-// Helper: compute category stats
+// Helper: Compute category stats
 function getCategoryStats() {
   const stats = {};
   for (const msg of messages) {
@@ -49,7 +49,7 @@ router.get("/", (req, res) => {
   }
 });
 
-// Handle chat form submission on POST "/chat"
+// Handle chat form submission
 router.post("/", (req, res) => {
   try {
     if (!req.body || typeof req.body.message !== "string") {
@@ -104,7 +104,7 @@ router.post("/", (req, res) => {
   }
 });
 
-// Handle personalization form submission on POST "/add-response"
+// Handle personalization form submission
 router.post("/add-response", (req, res) => {
   try {
     const { keyword, answer } = req.body;
@@ -164,7 +164,7 @@ router.post("/add-response", (req, res) => {
   }
 });
 
-// Handle statistics on GET "/stats"
+// Handle statistics
 router.get("/stats", (req, res) => {
   try {
     res.json({
@@ -178,7 +178,7 @@ router.get("/stats", (req, res) => {
   }
 });
 
-// Reset message array
+// Clear message array
 router.post("/clear", (req, res) => {
   try {
     messages.length = 0;

@@ -1,4 +1,4 @@
-// Basic input sanitization to prevent HTML/script injection
+// Input sanitization to prevent HTML/script injection
 function sanitizeInput(input) {
   try {
     if (typeof input !== "string") return "";

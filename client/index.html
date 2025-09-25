@@ -11,18 +11,20 @@
       <header>
         <h1>ChatBot</h1>
         <button class="open-personalization-modal">Personalize</button>
-        <form class="clear-form" method="POST" action="/clear">
-          <button class="clear-button" type="submit">Clear</button>
-        </form>
+        <div class="clear-form">
+          <button type="submit" class="clear-button" id="clearChat">
+            Clear
+          </button>
+        </div>
         <!--<div>
           <p>Most popular category:</p>
         </div>
-        <p>Antal beskeder i chatten:</p>
-        <p>Brugerbeskeder: | Botbeskeder: </p>-->
+        <p>Messages in chat:</p>
+        <p>User messages: | Bot messages: </p>-->
       </header>
       <div class="chat-messages-wrapper">
-        <div class="chat-messages">
-          <div class="message <%= msg.sender.toLowerCase() %>">
+        <div class="chat-messages" id="messages">
+          <div class="message">
             <!--<div>
               <span class="category-tag"></span>
               <span class="timestamp"></span>
@@ -31,7 +33,7 @@
         </div>
         <!--<div class="error-message"><strong>Error:</strong></div>-->
       </div>
-      <form method="POST" action="/chat" class="chat-form">
+      <form class="chat-form" id="chat-form">
         <input
           type="text"
           name="message"
@@ -50,7 +52,7 @@
       <div class="personalization-modal">
         <h2>Personalization</h2>
         <p>Here you can personalize the bot's responses:</p>
-        <form method="POST" action="/add-response" class="personalization-form">
+        <form id="personalization-form" class="personalization-form">
           <input
             type="text"
             name="keyword"
@@ -74,54 +76,6 @@
         <button id="closePersonalizationModal">Close</button>
       </div>
     </div>
-    <script>
-      // Chat messages wrapper
-      const chat = document.querySelector(".chat-messages-wrapper");
-      chat.scrollTop = chat.scrollHeight;
-
-      // Modal functionality
-      const modalOverlay = document.getElementById(
-        "personalizationModalOverlay"
-      );
-      const openModalBtn = document.querySelector(
-        ".open-personalization-modal"
-      );
-      const closeModalBtn = document.getElementById(
-        "closePersonalizationModal"
-      );
-
-      openModalBtn.addEventListener("click", () => {
-        modalOverlay.style.display = "flex";
-      });
-
-      closeModalBtn.addEventListener("click", () => {
-        modalOverlay.style.display = "none";
-      });
-
-      // Close when clicking outside of modal
-      modalOverlay.addEventListener("click", (e) => {
-        if (e.target === modalOverlay) {
-          modalOverlay.style.display = "none";
-        }
-      });
-
-      // character counter
-      let input = document.getElementById("message-input");
-      let counter = document.getElementById("character-count");
-      let container = document.querySelector(".character-counter");
-
-      input.addEventListener("input", function(event) {
-        let length = event.target.value.length
-        counter.innerText = length
-
-        container.classList.remove("warning", "danger")
-
-        if (length > 100) {
-          container.classList.add("danger")
-        } else if (length > 75) {
-          container.classList.add("warning")
-        }
-      })
-    </script>
+    <script src="app.js"></script>
   </body>
 </html>
