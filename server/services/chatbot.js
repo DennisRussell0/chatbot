@@ -12,18 +12,18 @@ function handleUserMessage(userMessage, originalUserMessage) {
     // Validate user input
     switch (true) {
       case !userMessage:
-        error = "You must write a message.";
+        error = "You must write a message before sending.";
         botReply = "Write a message to chat.";
         break;
 
       case userMessage.length < 2:
-        error = "The message must be at least two characters long.";
+        error = "Your message must be at least 2 characters long.";
         botReply =
           "Your message must contain at least 2 characters. Please try again.";
         break;
 
       case userMessage.length > 100:
-        error = "Message too long (maximum 100 characters)!";
+        error = "Your message can't contain more than 100 characters.";
         botReply =
           "Your message must not contain more than 100 characters. Please try again.";
         break;

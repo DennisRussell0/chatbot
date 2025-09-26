@@ -1,15 +1,44 @@
 import express from "express";
+import fs from "fs";
+import path from "path";
 import { handleUserMessage } from "../services/chatbot.js";
 import { sanitizeInput } from "../services/sanitizeInput.js";
 import responses from "../services/responses.js";
 
 const router = express.Router();
 
-// Store all chat messages momentarily - eventually in data/messages.json
-const messages = [];
+// Path to JSON-file
+const dataFile = path.resolve("./data/messages.json");
+
+// Helper: Load messages from file
+function loadMessages() {
+  try {
+    if (!fs.existsSync(dataFile)) {
+      fs.writeFileSync(dataFile, "[]", "utf-8");
+    }
+    const fileData = fs.readFileSync(dataFile, "utf-8");
+    if (!fileData.trim()) {
+      fs.writeFileSync(dataFile, "[]", "utf-8");
+      return [];
+    }
+    return JSON.parse(fileData);
+  } catch (err) {
+    console.error("Failed to load messages:", err);
+    return [];
+  }
+}
+
+// Helper: Save messages to file
+function saveMessages(messages) {
+  try {
+    fs.writeFileSync(dataFile, JSON.stringify(messages, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Failed to save messages:", err);
+  }
+}
 
 // Helper: Compute category stats
-function getCategoryStats() {
+function getCategoryStats(messages) {
   const stats = {};
   for (const msg of messages) {
     if (msg.category && msg.sender === "Bot") {
@@ -21,31 +50,26 @@ function getCategoryStats() {
 
 // Render the chat page on GET "/" (when the user visits the root URL)
 router.get("/", (req, res) => {
-  /* const totalMessages = messages.length;
-  const userCount = messages.filter(msg => msg.sender === "User").length;
-  const botCount = messages.filter(msg => msg.sender === "Bot").length;
-
-  res.render("index", {
-    messages,
-    botReply: "",
-    categoryStats: getCategoryStats(),
-    totalMessages, 
-    userCount, 
-    botCount
-  }); */
-
   try {
+    const messages = loadMessages();
     res.json({
       messages,
       totalMessages: messages.length,
       userCount: messages.filter((m) => m.sender === "User").length,
       botCount: messages.filter((m) => m.sender === "Bot").length,
-      categoryStats: getCategoryStats(),
+      categoryStats: getCategoryStats(messages),
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Failed to fetch messages.", details: err.message });
+    if (err instanceof SyntaxError) {
+      res
+        .status(500)
+        .json({ error: "Corrupted messages file.", details: err.message });
+    } else {
+      res
+        .status(500)
+        .json({ error: "Failed to load messages.", details: err.message });
+    }
+    console.error("Failed to load messages:", err);
   }
 });
 
@@ -71,6 +95,8 @@ router.post("/", (req, res) => {
       originalUserMessage
     );
 
+    const messages = loadMessages();
+
     // Save user and bot messages
     messages.push({
       sender: "User",
@@ -86,10 +112,7 @@ router.post("/", (req, res) => {
       category: matchedCategory,
     });
 
-    // Only show 10 latest messages
-    // if (messages.length > 10) messages.shift();
-
-    // return res.redirect("/");
+    saveMessages(messages);
 
     // Render the chat page with updated messages and any error
     res.json({
@@ -98,9 +121,20 @@ router.post("/", (req, res) => {
       error /* totalMessages, userCount, botCount*/,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Failed to process message.", details: err.message });
+    if (err instanceof TypeError) {
+      res
+        .status(500)
+        .json({ error: "Type error on server.", details: err.message });
+    } else if (err instanceof SyntaxError) {
+      res
+        .status(500)
+        .json({ error: "Syntax error in server data.", details: err.message });
+    } else {
+      res
+        .status(500)
+        .json({ error: "Failed to process message.", details: err.message });
+    }
+    console.error("Failed to process message:", err);
   }
 });
 
@@ -111,13 +145,11 @@ router.post("/add-response", (req, res) => {
 
     // Validate input
     if (!keyword || !answer) {
-      console.log("Error: Keyword or answer missing");
-      return res.redirect("/?error=missing_fields");
+      return res.status(400).json({ error: "Keyword or answer missing." });
     }
 
     if (keyword.trim().length === 0 || answer.trim().length === 0) {
-      console.log("Error: Empty fields");
-      return res.redirect("/?error=empty_fields");
+      return res.status(400).json({ error: "Empty fields." });
     }
 
     // Clear input
@@ -153,40 +185,67 @@ router.post("/add-response", (req, res) => {
       timestamp: new Date(),
     });
 
-    // Redirect
-    // res.redirect("/?success=response_added");
-
     res.json({ success: true, keyword: cleanKeyword, answer: cleanAnswer });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Failed to add response.", details: err.message });
+    if (err instanceof TypeError) {
+      res
+        .status(500)
+        .json({ error: "Type error on server.", details: err.message });
+    } else if (err instanceof SyntaxError) {
+      res
+        .status(500)
+        .json({ error: "Syntax error in server data.", details: err.message });
+    } else {
+      res
+        .status(500)
+        .json({ error: "Failed to add response.", details: err.message });
+    }
+    console.error("Failed to add response:", err);
   }
 });
 
 // Handle statistics
 router.get("/stats", (req, res) => {
   try {
+    const messages = loadMessages();
     res.json({
-      categoryStats: getCategoryStats(),
+      categoryStats: getCategoryStats(messages),
       totalMessages: messages.length,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Failed to fetch stats.", details: err.message });
+    if (err instanceof SyntaxError) {
+      res
+        .status(500)
+        .json({ error: "Corrupted messages file.", details: err.message });
+    } else {
+      res
+        .status(500)
+        .json({ error: "Failed to load stats.", details: err.message });
+    }
+    console.error("Failed to load stats:", err);
   }
 });
 
 // Clear message array
 router.post("/clear", (req, res) => {
   try {
-    messages.length = 0;
+    saveMessages([]);
     res.json({ success: true, message: "Chat cleared" });
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Failed to clear chat.", details: err.message });
+    if (err instanceof TypeError) {
+      res
+        .status(500)
+        .json({ error: "Type error on server.", details: err.message });
+    } else if (err instanceof SyntaxError) {
+      res
+        .status(500)
+        .json({ error: "Syntax error in server data.", details: err.message });
+    } else {
+      res
+        .status(500)
+        .json({ error: "Failed to clear chat.", details: err.message });
+    }
+    console.error("Failed to clear chat:", err);
   }
 });
 

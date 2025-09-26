@@ -16,22 +16,11 @@
             Clear
           </button>
         </div>
-        <!--<div>
-          <p>Most popular category:</p>
-        </div>
-        <p>Messages in chat:</p>
-        <p>User messages: | Bot messages: </p>-->
       </header>
-      <div class="chat-messages-wrapper">
+      <div class="chat-messages-wrapper" id="wrapper">
         <div class="chat-messages" id="messages">
-          <div class="message">
-            <!--<div>
-              <span class="category-tag"></span>
-              <span class="timestamp"></span>
-            </div>-->
-          </div>
+          <div class="message"></div>
         </div>
-        <!--<div class="error-message"><strong>Error:</strong></div>-->
       </div>
       <form class="chat-form" id="chat-form">
         <input
@@ -44,7 +33,7 @@
         <div class="character-counter">
           <span id="character-count">0</span>/100
         </div>
-        <button type="submit" class="chat-button">Send</button>
+        <button type="submit" class="chat-button" id="sendBtn">Send</button>
       </form>
     </div>
     <!-- Personalization modal -->
@@ -57,7 +46,6 @@
             type="text"
             name="keyword"
             placeholder="Keyword(s) (e.g. 'beluga whale' or 'weissbier')"
-            required
             maxlength="50"
             class="personalization-inputs"
           />
@@ -65,7 +53,6 @@
             type="text"
             name="answer"
             placeholder="Answer (e.g. 'I'd love a beluga whale in my backyard pond')"
-            required
             maxlength="200"
             class="personalization-inputs"
           />
@@ -75,6 +62,9 @@
         </form>
         <button id="closePersonalizationModal">Close</button>
       </div>
+    </div>
+    <div id="loading-overlay" style="display: none">
+      <div class="loading-message">Loading...</div>
     </div>
     <script src="app.js"></script>
   </body>
